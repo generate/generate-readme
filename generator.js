@@ -23,8 +23,8 @@ module.exports = function(app) {
    * @api public
    */
 
-  app.task('default', ['node']);
-  app.task('readme', ['node']);
+  app.task('default', ['readme-node']);
+  app.task('readme', ['readme-node']);
 
   /**
    * Generate a basic `README.md` for a node.js project to the current working
@@ -38,7 +38,8 @@ module.exports = function(app) {
    * @api public
    */
 
-  app.task('node', function() {
+  app.task('node', ['readme-node']);
+  app.task('readme-node', function() {
     return file(app, 'node');
   });
 
@@ -53,7 +54,7 @@ module.exports = function(app) {
    * @api public
    */
 
-  app.task('min', ['readme-minimal']);
+  app.task('minimal', ['readme-minimal']);
   app.task('readme-minimal', function() {
     return file(app, 'minimal');
   });

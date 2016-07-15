@@ -168,13 +168,6 @@ describe('generate-readme', function() {
   describe('sub-generator', function() {
     it('should work as a sub-generator', function(cb) {
       app.register('foo', function(foo) {
-        foo.register('generator', generator);
-      });
-      app.generate('foo.readme', exists('README.md', cb));
-    });
-
-    it('should run the `default` task by default', function(cb) {
-      app.register('foo', function(foo) {
         foo.register('readme', generator);
       });
       app.generate('foo.readme', exists('README.md', cb));
@@ -185,6 +178,20 @@ describe('generate-readme', function() {
         foo.register('readme', generator);
       });
       app.generate('foo.readme:default', exists('README.md', cb));
+    });
+
+    it('should run the `generator:node` task', function(cb) {
+      app.register('foo', function(foo) {
+        foo.register('readme', generator);
+      });
+      app.generate('foo.readme:node', exists('README.md', cb));
+    });
+
+    it('should run the `generator:minimal` task', function(cb) {
+      app.register('foo', function(foo) {
+        foo.register('readme', generator);
+      });
+      app.generate('foo.readme:minimal', exists('README.md', cb));
     });
 
     it('should run the `generator:readme` task', function(cb) {
