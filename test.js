@@ -6,30 +6,64 @@ var path = require('path');
 var assert = require('assert');
 var generate = require('generate');
 var npm = require('npm-install-global');
+var gm = require('global-modules');
 var del = require('delete');
+var pkg = require('./package');
 var generator = require('./');
 var app;
 
 var fixtures = path.resolve.bind(path, __dirname, 'templates');
 var actual = path.resolve.bind(path, __dirname, 'actual');
 
-function exists(name, cb) {
+function hasValue(str, val) {
+  return str.indexOf(val) !== -1;
+}
+
+function hasValues(str, arr) {
+  arr = Array.isArray(arr) ? arr : [arr];
+  var len = arr.length
+  var idx = -1;
+  while (++idx < len) {
+    if (!hasValue(str, arr[idx])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function exists(name, fn, cb) {
+  if (arguments.length === 2) {
+    cb = fn;
+    fn = function() {
+      return true;
+    };
+  }
   return function(err) {
     if (err) return cb(err);
     var filepath = actual(name);
-
     fs.stat(filepath, function(err, stat) {
       if (err) return cb(err);
       assert(stat);
-      assert(stat.isFile());
-      cb();
+      assert(fn(fs.readFileSync(filepath, 'utf8')));
+      del(actual(), cb);
     });
   };
 }
 
-describe('generate-readme', function() {
-  this.slow(250);
+function symlink(dir, cb) {
+  var src = path.resolve(dir);
+  var name = path.basename(src);
+  var dest = path.resolve(gm, name);
+  fs.stat(dest, function(err, stat) {
+    if (err) {
+      fs.symlink(src, dest, cb);
+    } else {
+      cb();
+    }
+  });
+}
 
+describe('generate-readme', function() {
   if (!process.env.CI && !process.env.TRAVIS) {
     before(function(cb) {
       npm.maybeInstall('generate', cb);
@@ -43,16 +77,12 @@ describe('generate-readme', function() {
     app.option('askWhen', 'not-answered');
 
     // provide template data to avoid prompts
+    app.data(pkg);
     app.data({
       author: {
         name: 'Jon Schlinkert',
         username: 'jonschlnkert',
         url: 'https://github.com/jonschlinkert'
-      },
-      project: {
-        name: 'foo',
-        description: 'bar',
-        version: '0.1.0'
       }
     });
   });
@@ -84,43 +114,55 @@ describe('generate-readme', function() {
 
     it('should run the `default` task with .build', function(cb) {
       app.use(generator);
-      app.build('default', exists(fixtures('README.md'), cb));
+      app.build('default', exists('README.md', function(str) {
+        return hasValues(str, [pkg.name, pkg.repository]);
+      }, cb));
     });
 
     it('should run the `default` task with .generate', function(cb) {
       app.use(generator);
-      app.generate('default', exists(fixtures('README.md'), cb));
+      app.generate('default', exists('README.md', function(str) {
+        return hasValues(str, [pkg.name, pkg.repository]);
+      }, cb));
     });
   });
 
   if (!process.env.CI && !process.env.TRAVIS) {
     describe('generator (CLI)', function() {
-      it('should run the default task using the `generate-readme` name', function(cb) {
-        app.use(generator);
-        app.generate('generate-readme', exists(fixtures('README.md'), cb));
+      before(function(cb) {
+        symlink(__dirname, cb);
       });
 
-      it('should run the default task using the `generator` generator alias', function(cb) {
+      it('should run the default task using the `generate-readme` name', function(cb) {
         app.use(generator);
-        app.generate('generator', exists(fixtures('README.md'), cb));
+        app.generate('generate-readme', exists('README.md', function(str) {
+          return hasValues(str, [pkg.name, pkg.repository]);
+        }, cb));
+      });
+
+      it('should run the default task using the `readme` generator alias', function(cb) {
+        app.use(generator);
+        app.generate('readme', exists('README.md', function(str) {
+          return hasValues(str, [pkg.name, pkg.repository]);
+        }, cb));
       });
     });
   }
 
   describe('generator (API)', function() {
     it('should run the default task on the generator', function(cb) {
-      app.register('generator', generator);
-      app.generate('generator', exists(fixtures('README.md'), cb));
+      app.register('readme', generator);
+      app.generate('readme', exists('README.md', cb));
     });
 
     it('should run the `readme` task', function(cb) {
-      app.register('generator', generator);
-      app.generate('generator:readme', exists(fixtures('README.md'), cb));
+      app.register('readme', generator);
+      app.generate('readme:readme', exists('README.md', cb));
     });
 
     it('should run the `default` task when defined explicitly', function(cb) {
-      app.register('generator', generator);
-      app.generate('generator:default', exists(fixtures('README.md'), cb));
+      app.register('readme', generator);
+      app.generate('readme:default', exists('README.md', cb));
     });
   });
 
@@ -129,28 +171,28 @@ describe('generate-readme', function() {
       app.register('foo', function(foo) {
         foo.register('generator', generator);
       });
-      app.generate('foo.generator', exists(fixtures('README.md'), cb));
+      app.generate('foo.readme', exists('README.md', cb));
     });
 
     it('should run the `default` task by default', function(cb) {
       app.register('foo', function(foo) {
-        foo.register('generator', generator);
+        foo.register('readme', generator);
       });
-      app.generate('foo.generator', exists(fixtures('README.md'), cb));
+      app.generate('foo.readme', exists('README.md', cb));
     });
 
     it('should run the `generator:default` task when defined explicitly', function(cb) {
       app.register('foo', function(foo) {
-        foo.register('generator', generator);
+        foo.register('readme', generator);
       });
-      app.generate('foo.generator:default', exists(fixtures('README.md'), cb));
+      app.generate('foo.readme:default', exists('README.md', cb));
     });
 
     it('should run the `generator:readme` task', function(cb) {
       app.register('foo', function(foo) {
-        foo.register('generator', generator);
+        foo.register('readme', generator);
       });
-      app.generate('foo.generator:readme', exists(fixtures('README.md'), cb));
+      app.generate('foo.readme:readme', exists('README.md', cb));
     });
 
     it('should work with nested sub-generators', function(cb) {
@@ -159,7 +201,7 @@ describe('generate-readme', function() {
         .register('bar', generator)
         .register('baz', generator)
 
-      app.generate('foo.bar.baz', exists(fixtures('README.md'), cb));
+      app.generate('foo.bar.baz', exists('README.md', cb));
     });
   });
 });
