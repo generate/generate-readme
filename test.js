@@ -12,7 +12,6 @@ var pkg = require('./package');
 var generator = require('./');
 var app;
 
-var fixtures = path.resolve.bind(path, __dirname, 'templates');
 var actual = path.resolve.bind(path, __dirname, 'actual');
 
 function hasValue(str, val) {
@@ -21,7 +20,7 @@ function hasValue(str, val) {
 
 function hasValues(str, arr) {
   arr = Array.isArray(arr) ? arr : [arr];
-  var len = arr.length
+  var len = arr.length;
   var idx = -1;
   while (++idx < len) {
     if (!hasValue(str, arr[idx])) {
@@ -199,7 +198,7 @@ describe('generate-readme', function() {
       app
         .register('foo', generator)
         .register('bar', generator)
-        .register('baz', generator)
+        .register('baz', generator);
 
       app.generate('foo.bar.baz', exists('README.md', cb));
     });
