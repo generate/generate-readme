@@ -155,7 +155,7 @@ $ gen readme:node
 $ gen readme:node --dest ./docs
 ```
 
-### [min](generator.js#L56)
+### [min](generator.js#L57)
 
 Generate a minimal `README.md` to the current working directory or specified `--dest`. Also aliased as `readme-minimal` to provide a semantic task name for plugin usage.
 
