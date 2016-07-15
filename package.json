@@ -2,16 +2,18 @@
   "name": "generate-readme",
   "description": "Generate a README.md using answers to prompts and data from the environment, like `package.json`, `.git` config, etc. This generator can be run by command line if Generate is installed globally, or you can use this as a plugin or sub-generator in your own generator.",
   "version": "0.1.1",
-  "homepage": "https://github.com/jonschlinkert/generate-readme",
+  "homepage": "https://github.com/generate/generate-readme",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
-  "repository": "jonschlinkert/generate-readme",
+  "repository": "generate/generate-readme",
   "bugs": {
-    "url": "https://github.com/jonschlinkert/generate-readme/issues"
+    "url": "https://github.com/generate/generate-readme/issues"
   },
   "license": "MIT",
   "files": [
+    "generator.js",
     "index.js",
     "LICENSE",
+    "README.md",
     "templates"
   ],
   "main": "index.js",
@@ -22,13 +24,13 @@
     "test": "mocha"
   },
   "dependencies": {
-    "generate-collections": "^0.3.5",
-    "generate-defaults": "^0.3.2",
+    "generate-defaults": "^0.4.0",
     "is-valid-app": "^0.2.0"
   },
   "devDependencies": {
     "delete": "^0.3.2",
-    "generate": "^0.8.6",
+    "generate": "^0.9.5",
+    "global-modules": "^0.2.2",
     "gulp-format-md": "^0.1.9",
     "mocha": "^2.5.3",
     "npm-install-global": "^0.1.2"
@@ -78,9 +80,9 @@
     ],
     "related": {
       "list": [
+        "generate-gitignore",
         "generate-license",
-        "generate-package",
-        "generate-gitignore"
+        "generate-package"
       ]
     },
     "reflinks": [
