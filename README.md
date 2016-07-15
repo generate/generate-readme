@@ -2,6 +2,7 @@
 
 Generate a README.md using answers to prompts and data from the environment, like `package.json`, `.git` config, etc. This generator can be run by command line if Generate is installed globally, or you can use this as a plugin or sub-generator in your own generator.
 
+Need to generate documentation? You might also be interested in [verb](https://github.com/verbose/verb).
 <br>
 ![generate-readme demo](https://raw.githubusercontent.com/generate/generate-readme/master/docs/demo.gif)
 
