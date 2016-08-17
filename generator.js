@@ -54,6 +54,7 @@ module.exports = function(app) {
    * @api public
    */
 
+  app.task('min', ['readme-minimal']);
   app.task('minimal', ['readme-minimal']);
   app.task('readme-minimal', function() {
     return file(app, 'minimal');
