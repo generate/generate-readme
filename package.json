@@ -1,7 +1,7 @@
 {
   "name": "generate-readme",
   "description": "Generate a README.md using answers to prompts and data from the environment, like `package.json`, `.git` config, etc. This generator can be run by command line if Generate is installed globally, or you can use this as a plugin or sub-generator in your own generator.",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "homepage": "https://github.com/generate/generate-readme",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "generate/generate-readme",
